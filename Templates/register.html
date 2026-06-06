@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>VendorBridge - Registration</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+    padding:40px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:35px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#0f766e;
+    margin-bottom:30px;
+    font-size:32px;
+}
+
+.photo{
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#0f766e,#14b8a6);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:45px;
+    margin:0 auto 30px;
+    box-shadow:0 5px 15px rgba(20,184,166,.3);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    outline:none;
+    transition:.3s;
+    font-size:15px;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#14b8a6;
+    box-shadow:0 0 8px rgba(20,184,166,.25);
+}
+
+.full{
+    grid-column:span 2;
+}
+
+textarea{
+    min-height:140px;
+    resize:none;
+}
+
+button{
+    width:220px;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg,#0f766e,#14b8a6);
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    margin:25px auto 0;
+    display:block;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.error{
+    color:red;
+    text-align:center;
+    margin-top:15px;
+}
+
+@media(max-width:768px){
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+.full{
+    grid-column:span 1;
+}
+
+.container{
+    padding:25px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>VendorBridge Registration</h1>
+
+<div class="photo" onclick="document.getElementById('profile_photo_input').click()" style="cursor: pointer; position: relative; overflow: hidden;">
+<span id="photo_label">📷</span>
+<img id="photo_preview" src="" style="display: none; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+</div>
+
+<form action="/register" method="POST">
+
+<input type="hidden" id="profile_photo_base64" name="profile_photo">
+<input type="file" id="profile_photo_input" style="display: none;" accept="image/*" onchange="previewPhoto(this)">
+
+<div class="grid">
+
+<input type="text"
+name="firstName"
+placeholder="First Name" required>
+
+<input type="text"
+name="lastName"
+placeholder="Last Name" required>
+
+<input type="email"
+name="email"
+placeholder="Email Address" required>
+
+<input type="tel"
+name="phone"
+placeholder="Phone Number" required>
+
+<select name="role" required>
+<option value="">Select Role</option>
+<option>Vendor</option>
+<option>Admin</option>
+<option>Approver</option>
+<option>Procurement Manager</option>
+</select>
+
+<input type="text"
+name="country"
+placeholder="Country" required>
+
+<input type="password"
+name="password"
+placeholder="Password" required>
+
+<textarea class="full"
+name="additionalInfo"
+placeholder="Additional Information"></textarea>
+
+</div>
+
+{% if error %}
+<div class="error" id="error" style="color:red; text-align:center; margin-top:15px;">{{ error }}</div>
+{% else %}
+<div class="error" id="error"></div>
+{% endif %}
+
+<button type="submit">
+Register
+</button>
+
+</form>
+
+</div>
+
+<script>
+function previewPhoto(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('photo_preview').src = e.target.result;
+            document.getElementById('photo_preview').style.display = 'block';
+            document.getElementById('photo_label').style.display = 'none';
+            document.getElementById('profile_photo_base64').value = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+
+</body>
+</html>

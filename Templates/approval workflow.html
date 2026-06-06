@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorBridge - Approval Workflow</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        /* HEADER */
+
+        .topbar {
+            height: 70px;
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* MAIN */
+
+        .main {
+            display: flex;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            min-height: calc(100vh - 70px);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, .08);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-top: 20px;
+        }
+
+        .sidebar ul li {
+            margin: 8px 12px;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 14px 18px;
+            border-radius: 10px;
+            transition: .3s;
+        }
+
+        .sidebar ul li a:hover {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .active {
+            background: #14b8a6;
+            color: white !important;
+        }
+
+        /* CONTENT */
+
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h2 {
+            color: #1f2937;
+        }
+
+        .heading p {
+            color: #6b7280;
+        }
+
+        /* STATUS CARD */
+
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .info-box {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .info-box strong {
+            color: #0f766e;
+        }
+
+        .status {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        /* WORKFLOW TIMELINE */
+
+        .timeline-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+        }
+
+        .timeline {
+            border-left: 4px solid #14b8a6;
+            padding-left: 25px;
+        }
+
+        .step {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            background: #14b8a6;
+            border-radius: 50%;
+        }
+
+        .step h4 {
+            color: #0f766e;
+        }
+
+        .step p {
+            color: #666;
+        }
+
+        /* REMARKS */
+
+        .remarks-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 15px;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #14b8a6;
+        }
+
+        /* ACTION BUTTONS */
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+        }
+
+        .approve {
+            background: #16a34a;
+        }
+
+        .reject {
+            background: #dc2626;
+        }
+
+        .forward {
+            background: #2563eb;
+        }
+
+        .btn:hover {
+            opacity: .9;
+        }
+
+        /* HISTORY TABLE */
+
+        .history-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #e6fffb;
+            color: #0f766e;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:992px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .history-box {
+                overflow-x: auto;
+            }
+
+        }
+
+        @media(max-width:768px) {
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="logo">VendorBridge</div>
+        <div class="user">👤 {{ session.get('name', session.get('user', 'User')) }} [{{ session.get('role', 'User') }}]
+        </div>
+    </div>
+
+    <div class="main">
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+            <ul>
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/vendors">🏢 Vendors</a></li>
+                <li><a href="/rfqs">📋 RFQs</a></li>
+                <li><a href="/comparison">💰 Quotations</a></li>
+                <li><a href="/approval" class="active">✅ Approvals</a></li>
+                <li><a href="/purchase-order">🛒 Purchase Orders</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li><a href="/activity-logs">📜 Activity Logs</a></li>
+                <li><a href="/logout">🚪 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <div class="heading">
+                <h2>Approval Workflow</h2>
+                <p>Review procurement requests and manage approval processes.</p>
+            </div>
+
+            <!-- STATUS TRACKING -->
+
+            <div class="status-card">
+
+                <div class="status-grid">
+
+                    <div class="info-box">
+                        <strong>RFQ ID</strong><br>
+                        {{ approval.get('rfq_id', 'N/A') }}
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Vendor Selected</strong><br>
+                        {{ approval.get('vendor_name', 'N/A') }}
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Quotation Value</strong><br>
+                        {{ approval.get('quotation_value', 'N/A') }}
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Status</strong><br>
+                        <span class="status">{{ approval.get('status', 'N/A') }}</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- APPROVAL TIMELINE -->
+
+            <div class="timeline-box">
+
+                <h3 style="margin-bottom:20px;">Approval Timeline</h3>
+
+                <div class="timeline">
+
+
+
+                </div>
+
+            </div>
+
+            <!-- APPROVAL REMARKS -->
+
+            <div class="remarks-box">
+
+                <h3 style="margin-bottom:15px;">Approval Remarks</h3>
+
+                <textarea placeholder="Enter approval comments, observations, or rejection reasons..."></textarea>
+
+                <div class="actions">
+
+                    <button class="btn approve">
+                        Approve Request
+                    </button>
+
+                    <button class="btn reject">
+                        Reject Request
+                    </button>
+
+                    <button class="btn forward">
+                        Forward to Next Level
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- HISTORY -->
+
+            <div class="history-box">
+
+                <h3 style="margin-bottom:15px;">Approval History</h3>
+
+                <table>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Remarks</th>
+                        <th>Status</th>
+                    </tr>
+
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorBridge - Create RFQ</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        /* HEADER */
+
+        .topbar {
+            height: 70px;
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* MAIN */
+
+        .main {
+            display: flex;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            min-height: calc(100vh - 70px);
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, .08);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-top: 20px;
+        }
+
+        .sidebar ul li {
+            margin: 8px 12px;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 14px 18px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 10px;
+            transition: .3s;
+        }
+
+        .sidebar ul li a:hover {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .active {
+            background: #14b8a6;
+            color: white !important;
+        }
+
+        /* CONTENT */
+
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            color: #1f2937;
+        }
+
+        .page-title p {
+            color: #6b7280;
+        }
+
+        /* FORM */
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+        }
+
+        .step {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .step div {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #14b8a6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: #14b8a6;
+        }
+
+        .full {
+            grid-column: span 2;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: none;
+        }
+
+        .vendor-box {
+            border: 1px solid #d1d5db;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .vendor-box label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* BUTTONS */
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+        }
+
+        .create {
+            background: #14b8a6;
+        }
+
+        .save {
+            background: #14b8a6;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:768px) {
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: span 1;
+            }
+
+            .sidebar {
+                width: 200px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+        <div class="logo">VendorBridge</div>
+        <div>👤 Procurement Manager</div>
+    </div>
+
+    <div class="main">
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+
+            <ul>
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/vendors">🏢 Vendors</a></li>
+                <li><a href="/rfqs" class="active">📋 RFQs</a></li>
+                <li><a href="/comparison">💰 Quotations</a></li>
+                <li><a href="/approval">✅ Approvals</a></li>
+                <li><a href="/purchase-order">🛒 Purchase Orders</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li><a href="/activity-logs">📜 Activity Logs</a></li>
+                <li><a href="/logout">🚪 Logout</a></li>
+            </ul>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <div class="page-title">
+                <h2>Create RFQ</h2>
+                <p>Initiate procurement requests and invite vendors.</p>
+            </div>
+
+            <div class="form-container">
+
+                <div class="step">
+                    <div>1</div>
+                    <div>2</div>
+                    <div>3</div>
+                </div>
+
+                <form action="/create_rfq" method="POST">
+
+                    <div class="grid">
+
+                        <!-- RFQ TITLE -->
+
+                        <div class="input-group">
+                            <label>RFQ Title</label>
+                            <input type="text" name="title" required placeholder="Office Furniture Procurement">
+                        </div>
+
+                        <!-- DEADLINE -->
+
+                        <div class="input-group">
+                            <label>Submission Deadline</label>
+                            <input type="date" name="deadline" required>
+                        </div>
+
+                        <!-- CATEGORY -->
+
+                        <div class="input-group">
+                            <label>Category</label>
+                            <select name="category">
+                                <option>Select Category</option>
+                                <option>Furniture</option>
+                                <option>IT Equipment</option>
+                                <option>Stationery</option>
+                                <option>Services</option>
+                            </select>
+                        </div>
+
+                        <!-- QUANTITY -->
+
+                        <div class="input-group">
+                            <label>Required Quantity</label>
+                            <input type="number" name="quantity" required placeholder="Enter Quantity">
+                        </div>
+
+                        <!-- PRODUCT DETAILS -->
+
+                        <div class="input-group full">
+                            <label>Product / Service Details</label>
+                            <textarea
+                                placeholder="Describe product specifications, requirements and conditions..."></textarea>
+                        </div>
+
+                        <!-- ATTACHMENTS -->
+
+                        <div class="input-group">
+                            <label>Upload Attachments</label>
+                            <input type="file">
+                        </div>
+
+                        <!-- PRIORITY -->
+
+                        <div class="input-group">
+                            <label>Priority</label>
+                            <select>
+                                <option>Normal</option>
+                                <option>High</option>
+                                <option>Urgent</option>
+                            </select>
+                        </div>
+
+                        <!-- VENDOR ASSIGNMENT -->
+
+                        <div class="input-group full">
+                            <label>Assign Vendors</label>
+
+                            <div class="vendor-box">
+                                {% for vendor in vendors %}
+                                    {% if vendor.vendor_name %}
+                                    <label>
+                                        <input type="checkbox" name="vendor_ids" value="{{ vendor['_id'] }}">
+                                        {{ vendor.vendor_name }}
+                                    </label>
+                                    {% endif %}
+                                {% endfor %}
+                                <!-- Quotation Details for RFQ -->
+                                <div class="grid">
+                                    <div class="input-group">
+                                        <label>Quoted Price</label>
+                                        <input type="text" name="quoted_price" placeholder="e.g., 1200.00">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Delivery Time (days)</label>
+                                        <input type="number" name="delivery_time" placeholder="e.g., 30">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Payment Terms</label>
+                                        <input type="text" name="payment_terms" placeholder="e.g., Net 30">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Warranty (months)</label>
+                                        <input type="number" name="warranty" placeholder="e.g., 12">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="actions">
+
+                        <button type="submit" class="btn create">
+                            Create RFQ
+                        </button>
+
+                        <button type="button" class="btn save">
+                            Save Draft
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VendorBridge - Submit Quotation</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+}
+
+/* TOPBAR */
+
+.topbar{
+    height:70px;
+    background:linear-gradient(135deg,#0f766e,#14b8a6);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 30px;
+    color:white;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+}
+
+/* MAIN LAYOUT */
+
+.main{
+    display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:250px;
+    min-height:calc(100vh - 70px);
+    background:white;
+    box-shadow:2px 0 10px rgba(0,0,0,.08);
+}
+
+.sidebar ul{
+    list-style:none;
+    padding-top:20px;
+}
+
+.sidebar ul li{
+    margin:8px 12px;
+}
+
+.sidebar ul li a{
+    display:block;
+    text-decoration:none;
+    color:#333;
+    padding:14px 18px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.sidebar ul li a:hover{
+    background:#14b8a6;
+    color:white;
+}
+
+.active{
+    background:#14b8a6;
+    color:white !important;
+}
+
+/* CONTENT */
+
+.content{
+    flex:1;
+    padding:30px;
+}
+
+.heading{
+    margin-bottom:25px;
+}
+
+.heading h2{
+    color:#1f2937;
+}
+
+.heading p{
+    color:#6b7280;
+}
+
+/* RFQ DETAILS */
+
+.rfq-card{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.rfq-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.info-box{
+    background:#f9fafb;
+    padding:12px;
+    border-radius:8px;
+}
+
+.info-box strong{
+    color:#0f766e;
+}
+
+/* FORM */
+
+.form-box{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.input-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.input-group label{
+    margin-bottom:8px;
+    font-weight:600;
+    color:#374151;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select{
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    outline:none;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus{
+    border-color:#14b8a6;
+}
+
+textarea{
+    resize:none;
+    min-height:120px;
+}
+
+.full{
+    grid-column:span 2;
+}
+
+/* BUTTONS */
+
+.actions{
+    margin-top:25px;
+    display:flex;
+    gap:15px;
+}
+
+.btn{
+    border:none;
+    padding:12px 25px;
+    border-radius:8px;
+    cursor:pointer;
+    color:white;
+    font-weight:600;
+}
+
+.save{
+    background:#14b8a6;
+}
+
+.submit{
+    background:#14b8a6;
+}
+
+.btn:hover{
+    opacity:.9;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+.sidebar{
+    width:200px;
+}
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+.full{
+    grid-column:span 1;
+}
+
+.rfq-grid{
+    grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="logo">VendorBridge</div>
+    <div class="user">👤 {{ session.get('name', session.get('user', 'User')) }} [{{ session.get('role', 'User') }}]</div>
+</div>
+
+<div class="main">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <ul>
+            <li><a href="/vendor-dashboard">🏠 Dashboard</a></li>
+            <li><a href="/vendor-dashboard">📋 RFQs</a></li>
+            <li><a href="/quotation" class="active">💰 Submit Quotation</a></li>
+            <li><a href="/vendor-dashboard">📊 RFQ Status</a></li>
+            <li><a href="/vendor-dashboard">🛒 Purchase Orders</a></li>
+            <li><a href="/vendor-dashboard">👤 Vendor Profile</a></li>
+            <li><a href="/logout">🚪 Logout</a></li>
+        </ul>
+
+    </div>
+
+    <!-- CONTENT -->
+
+    <div class="content">
+
+        <div class="heading">
+            <h2>Vendor Quotation Submission</h2>
+            <p>Respond to RFQs and submit quotations.</p>
+        </div>
+
+        <!-- RFQ DETAILS -->
+
+        <div class="rfq-card">
+
+            <h3 style="margin-bottom:15px;">RFQ Information</h3>
+
+            <div class="rfq-grid">
+
+                <div class="info-box">
+                    <strong>RFQ ID</strong><br>
+                    RFQ001
+                </div>
+
+                <div class="info-box">
+                    <strong>Category</strong><br>
+                    IT Equipment
+                </div>
+
+                <div class="info-box">
+                    <strong>Deadline</strong><br>
+                    15-Jun-2025
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- QUOTATION FORM -->
+
+        <div class="form-box">
+
+            <form action="/submit_quote" method="POST">
+
+                <div class="grid">
+
+                    <div class="input-group">
+                        <label>RFQ ID</label>
+                        <input type="text" name="rfq_id" value="RFQ001" readonly>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Product / Service Name</label>
+                        <input type="text" value="Laptop Procurement" readonly>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Quantity</label>
+                        <input type="number" value="50" readonly>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Total Amount (₹)</label>
+                        <input type="number" name="price" required placeholder="Enter Total Amount">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Delivery Timeline</label>
+                        <select name="delivery_days">
+                            <option value="7">7 Days</option>
+                            <option value="15">15 Days</option>
+                            <option value="30">30 Days</option>
+                            <option value="45">45 Days</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Quotation Validity</label>
+                        <input type="date">
+                    </div>
+
+                    <div class="input-group full">
+                        <label>Notes / Comments</label>
+                        <textarea placeholder="Enter additional comments, warranty details, payment terms, etc."></textarea>
+                    </div>
+
+                    <div class="input-group full">
+                        <label>Upload Quotation Document</label>
+                        <input type="file">
+                    </div>
+
+                </div>
+
+                <div class="actions">
+
+                    <button type="button" class="btn save">
+                        Save Draft
+                    </button>
+
+                    <button type="submit" class="btn submit">
+                        Submit Quotation
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

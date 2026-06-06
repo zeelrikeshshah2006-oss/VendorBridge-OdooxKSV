@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorBridge - Purchase Order & Invoice</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+        }
+
+        /* TOPBAR */
+
+        .topbar {
+            height: 70px;
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* MAIN LAYOUT */
+
+        .main {
+            display: flex;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            min-height: calc(100vh - 70px);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, .08);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-top: 20px;
+        }
+
+        .sidebar ul li {
+            margin: 8px 12px;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 14px 18px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 10px;
+            transition: .3s;
+        }
+
+        .sidebar ul li a:hover {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .active {
+            background: #14b8a6;
+            color: white !important;
+        }
+
+        /* CONTENT */
+
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h2 {
+            color: #1f2937;
+        }
+
+        .heading p {
+            color: #6b7280;
+        }
+
+        /* CARDS */
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .info-box {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .info-box strong {
+            color: #0f766e;
+        }
+
+        /* TABLE */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #e6fffb;
+            color: #0f766e;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* TOTAL SECTION */
+
+        .total-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .total-box {
+            width: 350px;
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .grand-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #16a34a;
+            border-top: 2px solid #ddd;
+            padding-top: 10px;
+        }
+
+        /* STATUS */
+
+        .status {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        /* ACTION BUTTONS */
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+        }
+
+        .pdf {
+            background: #dc2626;
+        }
+
+        .print {
+            background: #2563eb;
+        }
+
+        .email {
+            background: #7c3aed;
+        }
+
+        .update {
+            background: #16a34a;
+        }
+
+        .btn:hover {
+            opacity: .9;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:992px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                overflow-x: auto;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="logo">VendorBridge</div>
+        <div class="user">👤 {{ session.get('name', session.get('user', 'User')) }} [{{ session.get('role', 'User') }}]
+        </div>
+    </div>
+
+    <div class="main">
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+
+            <ul>
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/vendors">🏢 Vendors</a></li>
+                <li><a href="/rfqs">📋 RFQs</a></li>
+                <li><a href="/comparison">💰 Quotations</a></li>
+                <li><a href="/approval">✅ Approvals</a></li>
+                <li><a href="/purchase-order" class="active">🛒 Purchase Orders</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li><a href="/activity-logs">📜 Activity Logs</a></li>
+                <li><a href="/logout">🚪 Logout</a></li>
+            </ul>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <div class="heading">
+                <h2>Purchase Order & Invoice Generation</h2>
+                <p>Generate procurement documents from approved quotations.</p>
+            </div>
+
+            <!-- PURCHASE ORDER DETAILS -->
+
+            <div class="card">
+
+                <h3 style="margin-bottom:15px;">Purchase Order Information</h3>
+
+                <div class="grid">
+
+<div class="info-box">
+    <strong>Select Vendor</strong><br>
+    <form method="GET" action="/purchase-order">
+        <select name="vendor_id" onchange="this.form.submit()">
+            <option value="">-- Choose Vendor --</option>
+            {% for v in vendors %}
+                <option value="{{ v['_id'] }}" {% if vendor and vendor['_id'] == v['_id'] %}selected{% endif %}>{{ v.vendor_name or v.companyName }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+<div class="info-box">
+    <strong>Vendor</strong><br>
+    {{ vendor.vendor_name or vendor.companyName if vendor else 'Select a vendor' }}
+</div>
+
+<div class="info-box">
+    <strong>PO Number</strong><br>
+    {{ purchase_order.po_number if purchase_order else 'Select a vendor to view PO' }}
+</div>
+<div class="info-box">
+    <strong>Status</strong><br>
+    {{ purchase_order.status if purchase_order else 'N/A' }}
+</div>
+
+                </div>
+
+            </div>
+
+            <!-- INVOICE TABLE -->
+
+            <div class="card">
+
+                <h3>Invoice Details</h3>
+
+                <table>
+
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+
+                </table>
+
+                <!-- TOTALS -->
+
+                <div class="total-section">
+
+                    <div class="total-box">
+
+                        <div class="total-row">
+                            <span>Subtotal</span>
+                            <span>${{ '{:,.2f}'.format(subtotal) }}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>GST (18%)</span>
+                            <span>${{ '{:,.2f}'.format(gst) }}</span>
+                        </div>
+                        <div class="total-row grand-total">
+                            <span>Grand Total</span>
+                            <span>${{ '{:,.2f}'.format(total) }}</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+
+            <div class="card">
+
+                <h3 style="margin-bottom:15px;">Invoice Actions</h3>
+
+                <div class="actions">
+
+                    <button class="btn pdf">
+                        📄 Download PDF
+                    </button>
+
+                    <button class="btn print">
+                        🖨 Print Invoice
+                    </button>
+
+                    <button class="btn email">
+                        📧 Send via Email
+                    </button>
+
+                    <button class="btn update">
+                        🔄 Update Status
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- STATUS HISTORY -->
+
+            <div class="card">
+
+                <h3>Status Updates</h3>
+
+                <table>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Activity</th>
+                        <th>Status</th>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

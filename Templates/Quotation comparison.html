@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorBridge - Quotation Comparison</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+        body{background:#f5f7fb;}
+        .topbar{height:70px;background:linear-gradient(135deg,#0f766e,#14b8a6);display:flex;justify-content:space-between;align-items:center;padding:0 30px;color:white;}
+        .logo{font-size:28px;font-weight:bold;}
+        .main{display:flex;}
+        .sidebar{width:250px;background:white;min-height:calc(100vh-70px);box-shadow:2px 0 10px rgba(0,0,0,.08);}
+        .sidebar ul{list-style:none;padding-top:20px;}
+        .sidebar ul li{margin:8px 12px;}
+        .sidebar ul li a{display:block;padding:14px 18px;text-decoration:none;color:#333;border-radius:10px;transition:.3s;}
+        .sidebar ul li a:hover{background:#14b8a6;color:white;}
+        .active{background:#14b8a6;color:white!important;}
+        .content{flex:1;padding:30px;}
+        .heading{margin-bottom:25px;}
+        .heading h2{color:#1f2937;}
+        .heading p{color:#6b7280;}
+        .filter-box{background:white;padding:20px;border-radius:15px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,.08);}
+        .filter-row{display:flex;gap:15px;flex-wrap:wrap;align-items:center;}
+        .filter-row input,.filter-row select{padding:12px;border:1px solid #d1d5db;border-radius:8px;}
+        .btn{background:#14b8a6;color:white;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;}
+        .table-box{background:white;border-radius:15px;padding:20px;margin-top:20px;box-shadow:0 4px 15px rgba(0,0,0,.08);overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{padding:15px;text-align:center;border-bottom:1px solid #eee;}
+        th{background:#e6fffb;color:#0f766e;}
+        .best-price{background:#dcfce7;color:#15803d;font-weight:bold;}
+        .actions{margin-top:25px;display:flex;gap:15px;}
+        .approve{background:#14b8a6;}
+        .reject{background:#ef4444;}
+        .export{background:#2563eb;}
+        @media(max-width:992px){.sidebar{width:200px;}.table-box{overflow-x:auto;}}
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo">VendorBridge</div>
+        <div class="user">👤 {{ session.get('name', session.get('user', 'User')) }} [{{ session.get('role', 'User') }}]</div>
+    </div>
+    <div class="main">
+        <div class="sidebar">
+            <ul>
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/vendors">🏢 Vendors</a></li>
+                <li><a href="/rfqs">📋 RFQs</a></li>
+                <li><a href="/comparison" class="active">💰 Quotations</a></li>
+                <li><a href="/approval">✅ Approvals</a></li>
+                <li><a href="/purchase-order">🛒 Purchase Orders</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li><a href="/activity-logs">📜 Activity Logs</a></li>
+                <li><a href="/logout">🚪 Logout</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="heading"><h2>Quotation Comparison</h2><p>Compare vendor quotations and select the best supplier.</p></div>
+            <div class="filter-box">
+                <div class="filter-row" style="gap:10px;align-items:center;">
+                    <input type="text" placeholder="Search Vendor" id="vendorSearch" oninput="filterVendors()">
+                    <select id="vendorFilter" onchange="filterColumns()">
+                        <option value="">All Vendors</option>
+                        {% for comp in comparison %}
+                            <option value="{{ loop.index0 }}">{{ comp.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <a class="btn" href="/register">Add New Vendor</a>
+                </div>
+            </div>
+            <form action="/approve_vendor" method="POST">
+                <div class="table-box">
+                    <table>
+                        <tr>
+                            <th>Criteria</th>
+                            {% for comp in comparison %}
+                                <th>{{ comp.name }}</th>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Quoted Price</b></td>
+                            {% for comp in comparison %}
+                                <td class="{% if comp.price == min_price %}best-price{% endif %}">{{ comp.price if comp.price is not none else '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Delivery Time</b></td>
+                            {% for comp in comparison %}
+                                <td>{{ comp.delivery if comp.delivery else '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Vendor Rating</b></td>
+                            {% for comp in comparison %}
+                                <td>{{ comp.rating if comp.rating else '' }} ⭐</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Warranty</b></td>
+                            {% for comp in comparison %}
+                                <td>{{ comp.warranty if comp.warranty else '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Payment Terms</b></td>
+                            {% for comp in comparison %}
+                                <td>{{ comp.payment if comp.payment else '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Select Vendor</b></td>
+                            {% for comp in comparison %}
+                                <td><input type="radio" name="vendor_id" value="{{ comp.vendor_id }}"></td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn approve">Approve Selected Vendor</button>
+                    <button type="button" class="btn export" onclick="window.location.href='/submit_comparison'">Export Comparison</button>
+                    <button type="button" class="btn reject">Reject RFQ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorBridge - Quotation Comparison</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+        body{background:#f5f7fb;}
+        .topbar{height:70px;background:linear-gradient(135deg,#0f766e,#14b8a6);display:flex;justify-content:space-between;align-items:center;padding:0 30px;color:white;}
+        .logo{font-size:28px;font-weight:bold;}
+        .main{display:flex;}
+        .sidebar{width:250px;background:white;min-height:calc(100vh-70px);box-shadow:2px 0 10px rgba(0,0,0,.08);}
+        .sidebar ul{list-style:none;padding-top:20px;}
+        .sidebar ul li{margin:8px 12px;}
+        .sidebar ul li a{display:block;padding:14px 18px;text-decoration:none;color:#333;border-radius:10px;transition:.3s;}
+        .sidebar ul li a:hover{background:#14b8a6;color:white;}
+        .active{background:#14b8a6;color:white!important;}
+        .content{flex:1;padding:30px;}
+        .heading{margin-bottom:25px;}
+        .heading h2{color:#1f2937;}
+        .heading p{color:#6b7280;}
+        .filter-box{background:white;padding:20px;border-radius:15px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,.08);}
+        .filter-row{display:flex;gap:15px;flex-wrap:wrap;align-items:center;}
+        .filter-row input,.filter-row select{padding:12px;border:1px solid #d1d5db;border-radius:8px;}
+        .btn{background:#14b8a6;color:white;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;}
+        .table-box{background:white;border-radius:15px;padding:20px;margin-top:20px;box-shadow:0 4px 15px rgba(0,0,0,.08);overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{padding:15px;text-align:center;border-bottom:1px solid #eee;}
+        th{background:#e6fffb;color:#0f766e;}
+        .best-price{background:#dcfce7;color:#15803d;font-weight:bold;}
+        .rating{color:#f59e0b;font-size:18px;}
+        .actions{margin-top:25px;display:flex;gap:15px;}
+        .approve{background:#14b8a6;}
+        .reject{background:#ef4444;}
+        .export{background:#2563eb;}
+        @media(max-width:992px){.sidebar{width:200px;}.table-box{overflow-x:auto;}}
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo">VendorBridge</div>
+        <div class="user">👤 {{ session.get('name', session.get('user', 'User')) }} [{{ session.get('role', 'User') }}]</div>
+    </div>
+    <div class="main">
+        <div class="sidebar">
+            <ul>
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/vendors">🏢 Vendors</a></li>
+                <li><a href="/rfqs">📋 RFQs</a></li>
+                <li><a href="/comparison" class="active">💰 Quotations</a></li>
+                <li><a href="/approval">✅ Approvals</a></li>
+                <li><a href="/purchase-order">🛒 Purchase Orders</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li><a href="/activity-logs">📜 Activity Logs</a></li>
+                <li><a href="/logout">🚪 Logout</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="heading">
+                <h2>Quotation Comparison</h2>
+                <p>Compare vendor quotations and select the best supplier.</p>
+            </div>
+            <div class="filter-box">
+                <div class="filter-row" style="gap:10px;align-items:center;">
+    <input type="text" placeholder="Search Vendor" id="vendorSearch" oninput="filterVendors()">
+    <select id="vendorFilter" onchange="filterColumns()">
+        <option value="">All Vendors</option>
+        {% for v in vendors %}
+            <option value="{{ loop.index0 }}">{{ v.vendor_name or v.companyName }}</option>
+        {% endfor %}
+    </select>
+    <a class="btn" href="/register">Add New Vendor</a>
+</div>
+<script>
+function filterVendors() {
+    const query = document.getElementById('vendorSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('table tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td, th');
+        let match = false;
+        cells.forEach(cell => {
+            if (cell.textContent.toLowerCase().includes(query)) { match = true; }
+        });
+        row.style.display = match ? '' : 'none';
+    });
+}
+function filterColumns() {
+    const idx = document.getElementById('vendorFilter').value;
+    const ths = document.querySelectorAll('table th');
+    const rows = document.querySelectorAll('table tr');
+    ths.forEach((th, i) => { th.style.display = (idx === '' || i === parseInt(idx)+1) ? '' : 'none'; }); // +1 because first TH is Criteria
+    rows.forEach(row => {
+        const tds = row.querySelectorAll('td');
+        tds.forEach((td, i) => {
+            td.style.display = (idx === '' || i === parseInt(idx)) ? '' : 'none';
+        });
+    });
+}
+</script>
+            </div>
+            
+                <div class="table-box">
+                    <table>
+                        <tr>
+                            <th>Criteria</th>
+                            {% for vendor in vendors %}
+                                <th>{{ vendor.vendor_name or vendor.companyName }}</th>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Quoted Price</b></td>
+                            {% for vendor in vendors %}
+                                <td><input type="text" name="price_{{ vendor['_id'] }}" placeholder="0.00"></td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Delivery Time</b></td>
+                            {% for vendor in vendors %}
+                                <td><input type="text" name="delivery_{{ vendor['_id'] }}" placeholder="Days"></td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Vendor Rating</b></td>
+                            {% for vendor in vendors %}
+                                <td>{{ vendor.rating or "5.0" }} ⭐</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Warranty</b></td>
+                            {% for vendor in vendors %}
+                                <td><input type="text" name="warranty_{{ vendor['_id'] }}" placeholder="Months"></td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Payment Terms</b></td>
+                            {% for vendor in vendors %}
+                                <td><input type="text" name="payment_{{ vendor['_id'] }}" placeholder="e.g., Net 30"></td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td><b>Select Vendor</b></td>
+                            {% for vendor in vendors %}
+                                <td><input type="radio" name="selected_vendor" value="{{ vendor['_id'] }}"></td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn approve">Approve Selected Vendor</button>
+                    <button type="button" class="btn export">Export Comparison</button>
+                    <button type="button" class="btn reject">Reject RFQ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
